@@ -1,0 +1,3 @@
+#!/bin/bash
+
+k3s kubectl run nginx-yaml --image=nginx --dry-run=client -o yaml
