@@ -1,0 +1,12 @@
+#!/bin/bash
+# scripts/setup
+# This will be run per project
+# Trust mise config (per project)
+# ~r! which mise
+
+/user/local/bin/mise trust /workspaces/devpods/mise.toml && /user/local/bin/mise install
+# the "devpods" is the name of the current workspace
+# We are also running the mise install for the container
+
+# optionally install vim (mise doesnt work as there are missing packages for vim) -y autoapproves or can be done in your dotfiles setup script to hove vim in your devcontainer
+#sudo apt update && sudo apt install vi -y
