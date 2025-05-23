@@ -2,5 +2,5 @@
   "build": {    
     "dockerfile": "../Dockerfile"
   },
-  "postCreateCommand": "scripts/setup"
+  "postCreateCommand": "./scripts/setup"
 }
