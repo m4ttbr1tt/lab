@@ -1,0 +1,22 @@
+# execute
+# ansible-playbook --ask-become-pass
+#     add --check for a dryrun
+#
+# ansible-playbook --ask-become-pass --check archbox.yaml
+
+- hosts: localhost
+  become: true
+  tasks:
+    - name: Install core packages
+      pacman:
+        name:
+          - base-devel
+          - neovim
+          - git
+          - tmux
+        state: present
+    - name: Remove packages
+      pacman:
+        name:
+          - cmatrix
+        state: absent
