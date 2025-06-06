@@ -2,6 +2,8 @@
 
 echo "wip"
 
+if [[ true ]]; then
+  echo "some script"
+fi
 
-
-
+echo "wip"
