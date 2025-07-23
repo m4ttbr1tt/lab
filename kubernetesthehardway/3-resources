@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# config ssh
+#
+su - root
+
+sed -i \
+  's/^#*PermitRootLogin.*/PermitRootLogin yes/' \
+  /etc/ssh/sshd_config
+
+systemctl restart sshd
+
+ssh-keygen
+
+# copy public key to each machine
+#
+while read IP FQDN HOST SUBNET; do
+  ssh-copy-id root@${IP}
+done < machines.txt
+
+
+# verify connection
+#
+while read IP FQDN HOST SUBNET; do
+  ssh -n root@${IP} hostname
+done < machines.txt
+
+
+# hostnames set on each machine
+while read IP FQDN HOST SUBNET; do
+    CMD="sed -i 's/^127.0.1.1.*/127.0.1.1\t${FQDN} ${HOST}/' /etc/hosts"
+    ssh -n root@${IP} "$CMD"
+    ssh -n root@${IP} hostnamectl set-hostname ${HOST}
+    ssh -n root@${IP} systemctl restart systemd-hostnamed
+done < machines.txt
+
+# verify
+while read IP FQDN HOST SUBNET; do
+  ssh -n root@${IP} hostname --fqdn
+done < machines.txt
