@@ -38,3 +38,32 @@ done < machines.txt
 while read IP FQDN HOST SUBNET; do
   ssh -n root@${IP} hostname --fqdn
 done < machines.txt
+
+# create hosts file on jumpbox
+#
+echo "" > hosts
+echo "# Kubernetes The Hard Way" >> hosts
+
+
+# write entries into hosts file
+while read IP FQDN HOST SUBNET; do
+  ENTRY="${IP} ${FQDN} ${HOST}"
+  echo $ENTRY >> hosts
+done < machines.txt
+
+
+# append to machine hosts file
+cat hosts >> /etc/hosts
+
+#chech ssh using host names
+for host in server node-0 node-1
+  do ssh root@${host} hostname
+done
+
+
+# add /etc/host entries to remotes
+while read IP FQDN HOST SUBNET; do
+  scp hosts root@${HOST}:~/
+  ssh -n \
+    root@${HOST} "cat hosts >> /etc/hosts"
+done < machines.txt
