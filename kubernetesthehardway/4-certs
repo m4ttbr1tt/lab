@@ -64,3 +64,28 @@ for i in ${certs[*]}; do
     -CAcreateserial \
     -out "${i}.crt" # creates signed cert (valid for 10 years) by signing csr with CAs crt and key
 done
+
+
+ls -1 *.crt *.key *.csr
+
+
+# Copy the certificates and private keys to the node-0 and node-1
+#
+for host in node-0 node-1; do
+  ssh root@${host} mkdir /var/lib/kubelet/
+
+  scp ca.crt root@${host}:/var/lib/kubelet/
+
+  scp ${host}.crt \
+    root@${host}:/var/lib/kubelet/kubelet.crt
+
+  scp ${host}.key \
+    root@${host}:/var/lib/kubelet/kubelet.key
+done
+
+# Copy certs and keys to server
+scp \
+  ca.key ca.crt \
+  kube-api-server.key kube-api-server.crt \
+  service-accounts.key service-accounts.crt \
+  root@server:~/
