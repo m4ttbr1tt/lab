@@ -1,0 +1,66 @@
+#!/bin/bash
+
+
+#public key infrastructure setup
+
+#tls for 
+
+# Control Plane
+# kube-apiserver - core component server (exposes k8s http api)
+# kube-controller-manager - runs controller processes (manages state of api resources)
+# kube-scheduler - watches for new pods and assigns to node
+#
+# Nodes
+# kubelet - agent on each node - makes sure containers are running in pods
+# kube-proxy - network proxy running on each node
+
+# config file
+cat ca.conf
+
+
+# Service Accounts
+# kube-controller-manager uses keypair to generate and sign service account tokens
+#
+# Worker Nodes
+# Node Authorizer - authorizes API requests made by Kublets. Kubelets need a credential with group and username, so can be authorised by the Node Authorizer
+#
+# API Server is auto assigned dns of 'kubernetes'
+#
+#
+
+# gen self signed CA certificate
+#
+{
+  openssl genrsa -out ca.key 4096
+  openssl req -x509 -new -sha512 -noenc \
+    -key ca.key -days 3653 \
+    -config ca.conf \
+    -out ca.crt
+}
+
+
+# gen client and server certs for components and client cert for admin user
+#
+certs=(
+  "admin" "node-0" "node-1"
+  "kube-proxy" "kube-scheduler"
+  "kube-controller-manager"
+  "kube-api-server"
+  "service-accounts"
+)
+
+
+for i in ${certs[*]}; do
+  openssl genrsa -out "${i}.key" 4096 # gens private key
+
+  openssl req -new -key "${i}.key" -sha256 \
+    -config "ca.conf" -section ${i} \
+    -out "${i}.csr"            # creates csr (certificate signing request) using private key
+
+  openssl x509 -req -days 3653 -in "${i}.csr" \
+    -copy_extensions copyall \
+    -sha256 -CA "ca.crt" \
+    -CAkey "ca.key" \
+    -CAcreateserial \
+    -out "${i}.crt" # creates signed cert (valid for 10 years) by signing csr with CAs crt and key
+done
