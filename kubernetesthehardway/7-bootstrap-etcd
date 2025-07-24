@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Copy etcd binaries and systemd unit files to the server machine:
+#
+scp \
+  downloads/controller/etcd \
+  downloads/client/etcdctl \
+  units/etcd.service \
+  root@server:~/
+
+ssh root@server
+
+
+# Extract and install the etcd server and the etcdctl command line utility:
+
+{
+  mv etcd etcdctl /usr/local/bin/
+}
+
+
+# Configure the etcd Server
+
+{
+  mkdir -p /etc/etcd /var/lib/etcd
+  chmod 700 /var/lib/etcd
+  cp ca.crt kube-api-server.key kube-api-server.crt \
+    /etc/etcd/
+}
+
+# Create the etcd.service systemd unit file:
+
+mv etcd.service /etc/systemd/system/
+
+
+# Start the etcd Server
+#
+
+{
+  systemctl daemon-reload
+  systemctl enable etcd
+  systemctl start etcd
+}
+
+
+# List the etcd cluster members:
+#
+
+etcdctl member list
