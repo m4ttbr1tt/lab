@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Generate encryption Key
+#
+export ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64)
+
+# Create the encryption-config.yaml encryption config file:
+# envsubst is a shell command that replaces environment variables in a file
+#
+envsubst < configs/encryption-config.yaml \
+  > encryption-config.yaml
