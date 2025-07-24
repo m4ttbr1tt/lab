@@ -1,0 +1,27 @@
+# ssh-keygen -t ed25519 -f ~/.ssh/ansible-key -C "ansible key"
+# Copy to each target node
+#
+# for host in node-0 node-1 server jump; do
+#   ssh-copy-id -i ~/.ssh/ansible-key.pub root@$host
+# done
+#
+#
+# ansible-playbook -i inventory.ini k3s.yml --tags uninstall-server
+# ansible-playbook -i inventory.ini k3s.yml --tags uninstall-agents
+
+- name: Manage k3s application
+  hosts: all
+  become: true
+  tasks:
+    - name: Uninstall K3s Server
+      when: inventory_hostname in ['node-1', 'node-2','node-3']
+      shell: /usr/local/bin/k3s-uninstall.sh
+      args:
+        removes: /usr/local/bin/k3s
+      tags: uninstall-server
+    - name: Uninstall K3s Agent
+      when: inventory_hostname in ['node-4']
+      shell: /usr/local/bin/k3s-agent-uninstall.sh
+      args:
+        removes: /usr/local/bin/k3s
+      tags: uninstall-server
