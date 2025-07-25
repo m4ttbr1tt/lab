@@ -12,15 +12,12 @@ scp \
   configs/kube-apiserver-to-kubelet.yaml \
   root@server:~/
 
-
 ssh root@server
-
 
 # Create the Kubernetes configuration directory:
 #
 
 mkdir -p /etc/kubernetes/config
-
 
 # Install the Kubernetes binaries:
 #
@@ -32,11 +29,9 @@ mkdir -p /etc/kubernetes/config
     /usr/local/bin/
 }
 
-
 # Configure the Kubernetes API Server
 #
 #
-
 
 {
   mkdir -p /var/lib/kubernetes/
@@ -58,11 +53,9 @@ mv kube-apiserver.service \
 
 mv kube-controller-manager.kubeconfig /var/lib/kubernetes/
 
-
 # Create the kube-controller-manager.service systemd unit file:
 
 mv kube-controller-manager.service /etc/systemd/system/
-
 
 # Move the kube-scheduler kubeconfig into place:
 
@@ -72,11 +65,9 @@ mv kube-scheduler.kubeconfig /var/lib/kubernetes/
 
 mv kube-scheduler.yaml /etc/kubernetes/config/
 
-
 # Create the kube-scheduler.service systemd unit file:
 
 mv kube-scheduler.service /etc/systemd/system/
-
 
 # Start the Controller Services
 
@@ -94,7 +85,8 @@ mv kube-scheduler.service /etc/systemd/system/
 #
 systemctl is-active kube-apiserver
 
-
 # Any errors view logs
 #
 journalctl -u kube-apiserver
+
+# Had to set chmod x on executables
