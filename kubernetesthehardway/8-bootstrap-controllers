@@ -1,0 +1,100 @@
+#!/bin/bash
+
+scp \
+  downloads/controller/kube-apiserver \
+  downloads/controller/kube-controller-manager \
+  downloads/controller/kube-scheduler \
+  downloads/client/kubectl \
+  units/kube-apiserver.service \
+  units/kube-controller-manager.service \
+  units/kube-scheduler.service \
+  configs/kube-scheduler.yaml \
+  configs/kube-apiserver-to-kubelet.yaml \
+  root@server:~/
+
+
+ssh root@server
+
+
+# Create the Kubernetes configuration directory:
+#
+
+mkdir -p /etc/kubernetes/config
+
+
+# Install the Kubernetes binaries:
+#
+
+{
+  mv kube-apiserver \
+    kube-controller-manager \
+    kube-scheduler kubectl \
+    /usr/local/bin/
+}
+
+
+# Configure the Kubernetes API Server
+#
+#
+
+
+{
+  mkdir -p /var/lib/kubernetes/
+
+  mv ca.crt ca.key \
+    kube-api-server.key kube-api-server.crt \
+    service-accounts.key service-accounts.crt \
+    encryption-config.yaml \
+    /var/lib/kubernetes/
+}
+
+# Create the kube-apiserver.service systemd unit file:
+
+mv kube-apiserver.service \
+  /etc/systemd/system/kube-apiserver.service
+
+# Move the kube-controller-manager kubeconfig into place:
+#
+
+mv kube-controller-manager.kubeconfig /var/lib/kubernetes/
+
+
+# Create the kube-controller-manager.service systemd unit file:
+
+mv kube-controller-manager.service /etc/systemd/system/
+
+
+# Move the kube-scheduler kubeconfig into place:
+
+mv kube-scheduler.kubeconfig /var/lib/kubernetes/
+
+# Create the kube-scheduler.yaml configuration file:
+
+mv kube-scheduler.yaml /etc/kubernetes/config/
+
+
+# Create the kube-scheduler.service systemd unit file:
+
+mv kube-scheduler.service /etc/systemd/system/
+
+
+# Start the Controller Services
+
+{
+  systemctl daemon-reload
+
+  systemctl enable kube-apiserver \
+    kube-controller-manager kube-scheduler
+
+  systemctl start kube-apiserver \
+    kube-controller-manager kube-scheduler
+}
+
+# Check if service are active
+#
+systemctl is-active kube-apiserver
+
+
+# Any errors view logs
+#
+journalctl -u kube-apiserver
