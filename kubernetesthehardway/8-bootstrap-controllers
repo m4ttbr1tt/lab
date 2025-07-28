@@ -90,3 +90,19 @@ systemctl is-active kube-apiserver
 journalctl -u kube-apiserver
 
 # Had to set chmod x on executables
+#
+#
+# Verify using the kubectl command line tool:
+
+kubectl cluster-info \
+  --kubeconfig admin.kubeconfig
+
+# RBAC for Kubelet Authorization
+
+ssh root@server
+
+# Create the system:kube-apiserver-to-kubelet ClusterRole with permissions to access the Kubelet API
+# and perform most common tasks associated with managing pods:
+
+kubectl apply -f kube-apiserver-to-kubelet.yaml \
+  --kubeconfig admin.kubeconfig

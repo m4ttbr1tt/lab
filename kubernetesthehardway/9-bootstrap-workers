@@ -1,0 +1,194 @@
+#!/bin/bash
+
+# Copy the Kubernetes binaries and systemd unit files to each worker instance:
+#
+
+for HOST in node-0 node-1; do
+  SUBNET=$(grep ${HOST} machines.txt | cut -d " " -f 4)
+  sed "s|SUBNET|$SUBNET|g" \
+    configs/10-bridge.conf > 10-bridge.conf
+
+  sed "s|SUBNET|$SUBNET|g" \
+    configs/kubelet-config.yaml > kubelet-config.yaml
+
+  scp 10-bridge.conf kubelet-config.yaml \
+  root@${HOST}:~/
+done
+
+
+for HOST in node-0 node-1; do
+  scp \
+    downloads/worker/* \
+    downloads/client/kubectl \
+    configs/99-loopback.conf \
+    configs/containerd-config.toml \
+    configs/kube-proxy-config.yaml \
+    units/containerd.service \
+    units/kubelet.service \
+    units/kube-proxy.service \
+    root@${HOST}:~/
+done
+
+# Binaries
+# containerd                                                                                                                                                                 100%   56MB  11.1MB/s   00:05
+# containerd-shim-runc-v2                                                                                                                                                    100% 8060KB  11.1MB/s   00:00
+# containerd-stress                                                                                                                                                          100%   22MB  11.1MB/s   00:01
+# crictl                                                                                                                                                                     100%   38MB  11.1MB/s   00:03
+# ctr                                                                                                                                                                        100%   23MB  11.1MB/s   00:02
+# kubelet                                                                                                                                                                    100%   74MB  11.1MB/s   00:06
+# kube-proxy                                                                                                                                                                 100%   64MB  11.1MB/s   00:05
+# runc                                                                                                                                                                       100%   11MB  11.1MB/s   00:01
+# kubectl                                                                                                                                                                    100%   55MB  11.1MB/s   00:04
+# 99-loopback.conf                                                                                                                                                           100%   65    12.5KB/s   00:00
+# containerd-config.toml                                                                                                                                                     100%  470   227.0KB/s   00:00
+# kube-proxy-config.yaml                                                                                                                                                     100%  184    86.5KB/s   00:00
+# containerd.service                                                                                                                                                         100%  352   168.1KB/s   00:00
+# kubelet.service                                                                                                                                                            100%  365   178.5KB/s   00:00
+# kube-proxy.service                                                                                                                                                         100%  268   137.4KB/s   00:00
+# containerd                                                                                                                                                                 100%   56MB  11.1MB/s   00:05
+# containerd-shim-runc-v2                                                                                                                                                    100% 8060KB  11.1MB/s   00:00
+# containerd-stress                                                                                                                                                          100%   22MB  11.1MB/s   00:01
+# crictl                                                                                                                                                                     100%   38MB  11.1MB/s   00:03
+# ctr                                                                                                                                                                        100%   23MB  11.1MB/s   00:02
+# kubelet                                                                                                                                                                    100%   74MB  11.2MB/s   00:06
+# kube-proxy                                                                                                                                                                 100%   64MB  11.1MB/s   00:05
+# runc                                                                                                                                                                       100%   11MB  11.1MB/s   00:01
+# kubectl
+
+
+for HOST in node-0 node-1; do
+  scp \
+    downloads/cni-plugins/* \
+    root@${HOST}:~/cni-plugins/
+done
+
+
+# CNI-Plugins
+# bandwidth                                                                                                                                                                  100% 4546KB  10.8MB/s   00:00
+# bridge                                                                                                                                                                     100% 5163KB  10.9MB/s   00:00
+# dhcp                                                                                                                                                                       100%   12MB  11.1MB/s   00:01
+# dummy                                                                                                                                                                      100% 4734KB  10.9MB/s   00:00
+# firewall                                                                                                                                                                   100% 5191KB  10.9MB/s   00:00
+# host-device                                                                                                                                                                100% 4680KB  10.9MB/s   00:00
+# host-local                                                                                                                                                                 100% 3965KB  10.9MB/s   00:00
+# ipvlan                                                                                                                                                                     100% 4757KB  10.9MB/s   00:00
+# LICENSE                                                                                                                                                                    100%   11KB   1.8MB/s   00:00
+# loopback                                                                                                                                                                   100% 4018KB  10.9MB/s   00:00
+# macvlan                                                                                                                                                                    100% 4788KB  10.9MB/s   00:00
+# portmap                                                                                                                                                                    100% 4603KB  10.9MB/s   00:00
+# ptp                                                                                                                                                                        100% 4958KB  10.9MB/s   00:00
+# README.md                                                                                                                                                                  100% 2343   441.3KB/s   00:00
+# sbr                                                                                                                                                                        100% 4232KB  11.0MB/s   00:00
+# static                                                                                                                                                                     100% 3566KB  10.8MB/s   00:00
+# tap                                                                                                                                                                        100% 4813KB  10.9MB/s   00:00
+# tuning                                                                                                                                                                     100% 4110KB  10.9MB/s   00:00
+# vlan                                                                                                                                                                       100% 4754KB  10.9MB/s   00:00
+# vrf                                                                                                                                                                        100% 4383KB  10.9MB/s   00:00
+# bandwidth                                                                                                                                                                  100% 4546KB  11.0MB/s   00:00
+# bridge                                                                                                                                                                     100% 5163KB  11.1MB/s   00:00
+# dhcp                                                                                                                                                                       100%   12MB  11.1MB/s   00:01
+# dummy                                                                                                                                                                      100% 4734KB  11.1MB/s   00:00
+# firewall                                                                                                                                                                   100% 5191KB  11.1MB/s   00:00
+# host-device                                                                                                                                                                100% 4680KB  11.1MB/s   00:00
+# host-local                                                                                                                                                                 100% 3965KB  11.0MB/s   00:00
+# ipvlan                                                                                                                                                                     100% 4757KB  11.1MB/s   00:00
+# LICENSE                                                                                                                                                                    100%   11KB   4.7MB/s   00:00
+# loopback                                                                                                                                                                   100% 4018KB  11.1MB/s   00:00
+# macvlan                                                                                                                                                                    100% 4788KB  11.1MB/s   00:00
+# portmap                                                                                                                                                                    100% 4603KB  11.1MB/s   00:00
+# ptp                                                                                                                                                                        100% 4958KB  11.1MB/s   00:00
+# README.md                                                                                                                                                                  100% 2343     1.5MB/s   00:00
+# sbr                                                                                                                                                                        100% 4232KB  11.1MB/s   00:00
+# static                                                                                                                                                                     100% 3566KB  11.0MB/s   00:00
+# tap                                                                                                                                                                        100% 4813KB  11.1MB/s   00:00
+# tuning                                                                                                                                                                     100% 4110KB  11.1MB/s   00:00
+# vlan                                                                                                                                                                       100% 4754KB  11.1MB/s   00:00
+# vrf
+#
+#
+
+# on node-0 and node-1
+{
+  apt-get update
+  apt-get -y install socat conntrack ipset kmod
+}
+
+swapon --show
+swapoff -a
+
+# Create the installation directories:
+
+mkdir -p \
+  /etc/cni/net.d \
+  /opt/cni/bin \
+  /var/lib/kubelet \
+  /var/lib/kube-proxy \
+  /var/lib/kubernetes \
+  /var/run/kubernetes
+
+
+# Install the worker binaries:
+
+{
+  mv crictl kube-proxy kubelet runc \
+    /usr/local/bin/
+  mv containerd containerd-shim-runc-v2 containerd-stress /bin/
+  mv cni-plugins/* /opt/cni/bin/
+}
+
+
+# Create the bridge network configuration file:
+#
+
+mv 10-bridge.conf 99-loopback.conf /etc/cni/net.d/
+
+
+# To ensure network traffic crossing the CNI bridge network is processed by iptables, load and configure the br-netfilter kernel module:
+
+{
+  modprobe br-netfilter
+  echo "br-netfilter" >> /etc/modules-load.d/modules.conf
+}
+
+
+{
+  echo "net.bridge.bridge-nf-call-iptables = 1" \
+    >> /etc/sysctl.d/kubernetes.conf
+  echo "net.bridge.bridge-nf-call-ip6tables = 1" \
+    >> /etc/sysctl.d/kubernetes.conf
+  sysctl -p /etc/sysctl.d/kubernetes.conf
+}
+
+# Configure containerd
+# Install the containerd configuration files:
+
+{
+  mkdir -p /etc/containerd/
+  mv containerd-config.toml /etc/containerd/config.toml
+  mv containerd.service /etc/systemd/system/
+}
+
+# Configure the Kubelet
+# Create the kubelet-config.yaml configuration file:
+
+{
+  mv kubelet-config.yaml /var/lib/kubelet/
+  mv kubelet.service /etc/systemd/system/
+}
+
+
+#Configure the Kubernetes Proxy
+
+{
+  mv kube-proxy-config.yaml /var/lib/kube-proxy/
+  mv kube-proxy.service /etc/systemd/system/
+}
+
+
+# Start the Worker Services
+
+{
+  systemctl daemon-reload
+  systemctl enable containerd kubelet kube-proxy
+  systemctl start containerd kubelet kube-proxy
+}
