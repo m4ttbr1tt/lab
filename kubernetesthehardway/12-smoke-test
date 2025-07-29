@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Create a generic secret:
+
+kubectl create secret generic kubernetes-the-hard-way \
+  --from-literal="mykey=mydata"
+
+ssh root@server \
+    'etcdctl get /registry/secrets/default/kubernetes-the-hard-way | hexdump -C'
+
+
+# Create a deployment for the nginx web server:
+
+kubectl create deployment nginx \
+  --image=nginx:latest
+
+# List the pod created by the nginx deployment:
+
+kubectl get pods -l app=nginx
+
+
+# Retrieve the full name of the nginx pod:
+
+POD_NAME=$(kubectl get pods -l app=nginx \
+  -o jsonpath="{.items[0].metadata.name}")
+
+
+# Forward port 8080 on your local machine to port 80 of the nginx pod:
+
+kubectl port-forward $POD_NAME 8080:80
+
+
+curl --head http://127.0.0.1:8080
+
+
+# exec commands in container
+kubectl exec -ti $POD_NAME -- nginx -v
+
+
+# Expose the nginx deployment using a NodePort service:
+
+kubectl expose deployment nginx \
+  --port 80 --type NodePort
+
+
+# Retrieve the node port assigned to the nginx service:
+
+NODE_PORT=$(kubectl get svc nginx \
+  --output=jsonpath='{range .spec.ports[0]}{.nodePort}')
+
+
+# Retrieve the hostname of the node running the nginx pod:
+
+NODE_NAME=$(kubectl get pods \
+  -l app=nginx \
+  -o jsonpath="{.items[0].spec.nodeName}")
