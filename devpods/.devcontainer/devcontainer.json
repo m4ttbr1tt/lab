@@ -2,6 +2,7 @@
   "build": {
     "dockerfile": "../Dockerfile"
   },
+  "onCreateCommand": "sudo chsh -s /usr/bin/zsh $USER",
   "postCreateCommand": "./scripts/setup",
   "features": {
     "ghcr.io/devcontainers/features/rust:1": {}
