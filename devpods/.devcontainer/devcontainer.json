@@ -1,6 +1,21 @@
 {
-  "build": {    
+  "build": {
     "dockerfile": "../Dockerfile"
   },
-  "postCreateCommand": "./scripts/setup"
+  "postCreateCommand": "./scripts/setup",
+  "features": {
+    "ghcr.io/devcontainers/features/rust:1": {}
+  },
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.profiles.linux": {
+      "zsh": {
+        "path": "/usr/bin/zsh"
+      }
+    }
+  },
+  "remoteEnv": {
+    "LANG": "en_US.UTF-8",
+    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
+  }
 }
