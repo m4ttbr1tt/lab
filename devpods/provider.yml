@@ -1,42 +1,42 @@
-# podman-provider.yaml
-name: podman
-version: v0.0.1
-description: "Run DevPod workspaces on a local (or remote) Podman daemon"
-icon: https://raw.githubusercontent.com/containers/podman/main/logo/podman-logo-inline.png
-
-options:
-  PODMAN_PATH:
-    description: "Absolute path (or command name) for the Podman CLI"
-    default: podman
-  PODMAN_HOST:
-    description: "Podman REST socket to target (unix://, tcp:// or ssh://)"
-    default: "unix:///run/user/${UID}/podman/podman.sock"
-  INACTIVITY_TIMEOUT:
-    description: "Auto-stop the workspace after this idle period (e.g. 30m, 2h)"
-    default: ""
-
-agent:                       # tell DevPod how to inject its helper
-  containerInactivityTimeout: ${INACTIVITY_TIMEOUT}
-  local: true                # this provider never creates VMs
-  docker:                    # reuse “docker” driver against Podman
-    path:  ${PODMAN_PATH}
-    host:  ${PODMAN_HOST}
-    install: false           # don’t try to install Docker inside the container
-
-exec:                        # shell snippets executed by DevPod
-  init: |-
-    # Verify Podman exists and is reachable
-    ${PODMAN_PATH} --version >/dev/null 2>&1 || {
-      >&2 echo "❌ Podman binary not found at ${PODMAN_PATH}"
-      exit 1
-    }
-    ${PODMAN_PATH} --url=${PODMAN_HOST} ps >/dev/null 2>&1 || {
-      >&2 echo "❌ Cannot reach Podman at ${PODMAN_HOST}"
-      >&2 echo "   Start the socket or adjust PODMAN_HOST."
-      exit 1
-    }
-  # DevPod replaces ${COMMAND} with the actual command it needs to
-  # run inside the workspace container.
-  command: |-
-    "${DEVPOD}" helper sh -c "${COMMAND}"
+# # podman-provider.yaml
+# name: podman
+# version: v0.0.1
+# description: "Run DevPod workspaces on a local (or remote) Podman daemon"
+# icon: https://raw.githubusercontent.com/containers/podman/main/logo/podman-logo-inline.png
+#
+# options:
+#   PODMAN_PATH:
+#     description: "Absolute path (or command name) for the Podman CLI"
+#     default: podman
+#   PODMAN_HOST:
+#     description: "Podman REST socket to target (unix://, tcp:// or ssh://)"
+#     default: "unix:///run/user/${UID}/podman/podman.sock"
+#   INACTIVITY_TIMEOUT:
+#     description: "Auto-stop the workspace after this idle period (e.g. 30m, 2h)"
+#     default: ""
+#
+# agent:                       # tell DevPod how to inject its helper
+#   containerInactivityTimeout: ${INACTIVITY_TIMEOUT}
+#   local: true                # this provider never creates VMs
+#   docker:                    # reuse “docker” driver against Podman
+#     path:  ${PODMAN_PATH}
+#     host:  ${PODMAN_HOST}
+#     install: false           # don’t try to install Docker inside the container
+#
+# exec:                        # shell snippets executed by DevPod
+#   init: |-
+#     # Verify Podman exists and is reachable
+#     ${PODMAN_PATH} --version >/dev/null 2>&1 || {
+#       >&2 echo "❌ Podman binary not found at ${PODMAN_PATH}"
+#       exit 1
+#     }
+#     ${PODMAN_PATH} --url=${PODMAN_HOST} ps >/dev/null 2>&1 || {
+#       >&2 echo "❌ Cannot reach Podman at ${PODMAN_HOST}"
+#       >&2 echo "   Start the socket or adjust PODMAN_HOST."
+#       exit 1
+#     }
+#   # DevPod replaces ${COMMAND} with the actual command it needs to
+#   # run inside the workspace container.
+#   command: |-
+#     "${DEVPOD}" helper sh -c "${COMMAND}"
 
